@@ -32,8 +32,6 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=DEPENDENCIES,
-    setup_requires=[],
-    tests_require=['tox'],
     py_modules=['firefence'],
     classifiers=[
         'Development Status :: 4 - Beta',
