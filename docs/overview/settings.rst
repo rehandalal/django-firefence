@@ -18,13 +18,16 @@ All the settings are optional and can be set in your Django settings file as fol
 
 These are the available settings:
 
-:RULES: A list or tuple of default rules. These will be used by the middleware or the decorator
-        (if not specified).
 
-        **DEFAULT:** ``()``
+**RULES**
+    A list or tuple of default rules. These will be used by the middleware or the decorator
+    (if not specified).
+
+    *DEFAULT:* ``()``
 
 
-:DEFAULT_BACKEND: An import path for the backend class to use. This backend will be used by the
-                  middleware and the decorator (if not specified).
+**DEFAULT_BACKEND**
+    An import path for the backend class to use. This backend will be used by the
+    middleware and the decorator (if not specified).
 
-                  **DEFAULT:** ``'firefence.backends.Fence'``
+    *DEFAULT:* ``'firefence.backends.Fence'``

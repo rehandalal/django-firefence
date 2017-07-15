@@ -17,4 +17,4 @@ class FirefenceMiddleware(object):
         backend_class = get_backend_class()
         fence = backend_class(FIREFENCE_SETTINGS.get('RULES'))
         if not fence.allows(request):
-            return fence.reject()
+            return fence.reject(request)

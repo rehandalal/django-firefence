@@ -31,18 +31,18 @@ class AbstractFence(object):
     def allows(self, request):
         return self.rules.allows(request)
 
-    def reject(self):
+    def reject(self, request, *args, **kwargs):
         raise NotImplementedError()  # pragma: no cover
 
     def protect(self, view_func):
         @wraps(view_func)
         def wrapped_view(request, *args, **kwargs):
             if not self.allows(request):
-                return self.reject()
+                return self.reject(request, *args, **kwargs)
             return view_func(request, *args, **kwargs)
         return wrapped_view
 
 
 class Fence(AbstractFence):
-    def reject(self):
+    def reject(self, request, *args, **kwargs):
         raise PermissionDenied
