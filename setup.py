@@ -1,6 +1,11 @@
-from setuptools import setup
+"""
+Like a firewall but smaller.
 
-import firefence
+Protect your views from intruders!
+"""
+import os
+
+from setuptools import find_packages, setup
 
 
 DEPENDENCIES = [
@@ -8,25 +13,34 @@ DEPENDENCIES = [
     'six >= 1.10.0',
 ]
 
+ROOT = os.path.abspath(os.path.dirname(__file__))
+
+version = __import__('firefence').__version__
+
 
 setup(
     name='django-firefence',
-    version=firefence.__version__,
-    packages=[
-        'firefence',
-    ],
+    version=version,
+    url='https://github.com/rehandalal/django-firefence',
+    license='Mozilla Public License Version 2.0',
     author='Rehan Dalal',
     author_email='rehan@meet-rehan.com',
-    license='Mozilla Public License Version 2.0',
-    description='A firewall for your Django views',
-    long_description='',
-    url='https://github.com/rehandalal/django-firefence',
+    description='A firewall for your Django views.',
+    long_description=__doc__,
+    packages=find_packages(exclude=['tests', 'docs']),
+    include_package_data=True,
+    zip_safe=False,
+    platforms='any',
     install_requires=DEPENDENCIES,
+    setup_requires=[],
+    tests_require=['tox'],
+    py_modules=['firefence'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Framework :: Django :: 1.8',
+        'Framework :: Django :: 1.9',
         'Framework :: Django :: 1.10',
         'Framework :: Django :: 1.11',
         'Intended Audience :: Developers',
@@ -40,8 +54,5 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-    ],
-    tests_require=DEPENDENCIES,
-    test_suite='tests',
-    zip_safe=False
+    ]
 )
