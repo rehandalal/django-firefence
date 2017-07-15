@@ -1,78 +1,48 @@
 from functools import wraps
 
-import ipcalc
-
 from django.core.exceptions import PermissionDenied
+from django.utils.module_loading import import_string
 
-from firefence.exceptions import InvalidRule
-
-
-def get_client_ip(request):
-    xff = request.META.get('HTTP_X_FORWARDED_FOR')
-    return xff.split(',').pop() if xff else request.META.get('REMOTE_ADDR')
+from firefence.rules import RuleSet
+from firefence.settings import FIREFENCE_SETTINGS
 
 
-def get_server_port(request):
-    return request.META.get('HTTP_X_FORWARDED_PORT', request.META.get('SERVER_PORT'))
+def get_backend_class(import_path=None):
+    return import_string(import_path or FIREFENCE_SETTINGS.get('DEFAULT_BACKEND'))
 
 
-class Rule(object):
-    def __init__(self, type, ips=(), ports=()):
-        if type not in ('allow', 'deny'):
-            raise InvalidRule('Rule type must be ALLOW or DENY.')
+class AbstractFence(object):
+    _rules = RuleSet()
 
-        self.type = type.lower()
-        self.ips = ips
-        self.ports = [str(port) for port in ports]
-
-    def ip_allowed(self, request):
-        ip = get_client_ip(request)
-
-        if self.ips:
-            ip_matched = False
-
-            for rule_ip in self.ips:
-                ip_matched |= ip in ipcalc.Network(rule_ip)
-
-            if (self.type == 'allow' and not ip_matched) or (self.type == 'deny' and ip_matched):
-                return False
-
-        return True
-
-    def port_allowed(self, request):
-        port = get_server_port(request)
-        return port in self.ports if self.ports else True
-
-    def allowed(self, request):
-        return self.ip_allowed(request) and self.port_allowed(request)
-
-
-class Fence(object):
     def __init__(self, rules=None):
         self.rules = rules
 
-    def allowed(self, request):
-        if self.rules:
-            allowed = False
+    @property
+    def rules(self):
+        return self._rules
 
-            for rule in self.rules:
-                if 'type' not in rule:
-                    raise InvalidRule('Rules must have a type.')
+    @rules.setter
+    def rules(self, value):
+        if isinstance(value, RuleSet):
+            self._rules = value
+        else:
+            self._rules = RuleSet(value)
 
-                allowed |= Rule(**rule).allowed(request)
-
-            return allowed
-        return True
+    def allows(self, request):
+        return self.rules.allows(request)
 
     def reject(self):
-        raise PermissionDenied()
+        raise NotImplementedError()  # pragma: no cover
 
-    def protect(self):
-        def decorator(view_func):
-            @wraps(view_func)
-            def wrapped_view(request, *args, **kwargs):
-                if not self.allowed(request):
-                    return self.reject()
-                return view_func(request, *args, **kwargs)
-            return wrapped_view
-        return decorator
+    def protect(self, view_func):
+        @wraps(view_func)
+        def wrapped_view(request, *args, **kwargs):
+            if not self.allows(request):
+                return self.reject()
+            return view_func(request, *args, **kwargs)
+        return wrapped_view
+
+
+class Fence(AbstractFence):
+    def reject(self):
+        raise PermissionDenied

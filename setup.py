@@ -9,16 +9,6 @@ DEPENDENCIES = [
 ]
 
 
-def read(filename):
-    with open(filename) as f:
-        return f.read()
-
-
-def get_requirements_tests():
-    with open('requirements.txt') as f:
-        return f.readlines()
-
-
 setup(
     name='django-firefence',
     version=firefence.__version__,
@@ -29,7 +19,7 @@ setup(
     author_email='rehan@meet-rehan.com',
     license='Mozilla Public License Version 2.0',
     description='A firewall for your Django views',
-    long_description=read('README.md'),
+    long_description='',
     url='https://github.com/rehandalal/django-firefence',
     install_requires=DEPENDENCIES,
     classifiers=[
@@ -51,7 +41,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
-    tests_require=get_requirements_tests(),
+    tests_require=DEPENDENCIES,
     test_suite='tests',
     zip_safe=False
 )

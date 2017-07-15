@@ -1,7 +1,5 @@
-from django.conf import settings
-from django.utils.module_loading import import_string
-
-from firefence import Fence
+from firefence.backends import get_backend_class
+from firefence.settings import FIREFENCE_SETTINGS
 
 
 class FirefenceMiddleware(object):
@@ -10,14 +8,13 @@ class FirefenceMiddleware(object):
         super(FirefenceMiddleware, self).__init__()
 
     def __call__(self, request):
-        return self.process_request(request)
+        response = self.process_request(request)
+        if not response:
+            response = self.get_response(request)
+        return response
 
     def process_request(self, request):
-        default_backend = getattr(settings, 'FIREFENCE_DEFAULT_BACKEND', Fence)
-        if isinstance(default_backend, str):
-            default_backend = import_string(default_backend)
-
-        fence = default_backend(getattr(settings, 'FIREFENCE_RULES'))
-
-        if not fence.allowed(request):
-            fence.reject()
+        backend_class = get_backend_class()
+        fence = backend_class(FIREFENCE_SETTINGS.get('RULES'))
+        if not fence.allows(request):
+            return fence.reject()

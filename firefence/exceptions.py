@@ -1,2 +1,0 @@
-class InvalidRule(Exception):
-    pass
