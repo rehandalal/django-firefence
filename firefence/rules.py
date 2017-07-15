@@ -3,7 +3,7 @@ import ipcalc
 
 def get_remote_ip(request):
     xff = request.META.get('HTTP_X_FORWARDED_FOR')
-    return xff.split(',').pop() if xff else request.META.get('REMOTE_ADDR')
+    return xff.split(',')[0] if xff else request.META.get('REMOTE_ADDR')
 
 
 def get_remote_host(request):
@@ -11,7 +11,10 @@ def get_remote_host(request):
 
 
 def get_server_port(request):
-    return request.META.get('HTTP_X_FORWARDED_PORT', request.META.get('SERVER_PORT'))
+    try:
+        return int(request.META.get('HTTP_X_FORWARDED_PORT', request.META.get('SERVER_PORT')))
+    except (TypeError, ValueError):
+        return None
 
 
 class Rule(object):
@@ -20,21 +23,22 @@ class Rule(object):
 
     _action = None
     _ports = ()
+    host = None
 
     def __init__(self, **kwargs):
         if 'action' not in kwargs:
             raise ValueError('Rules must have an action.')
         self.action = kwargs.get('action')
-        self.address = kwargs.get('address')
+        self.host = kwargs.get('host')
         self.port = kwargs.get('port')
 
     def __str__(self):
-        str = self.action
-        if self.address:
-            str += ' from {}'.format(self.address)
+        string = self.action
+        if self.host:
+            string += ' from {}'.format(self.host)
         if self.port:
-            str += ' to {}'.format(self.port)
-        return str
+            string += ' to {}'.format(self.port)
+        return string or ''
 
     def __repr__(self):
         return '<Rule: {}>'.format(self)
@@ -65,7 +69,7 @@ class Rule(object):
     def port(self, value):
         if value is None:
             self._ports = ()
-        else:
+        elif isinstance(value, (str, int)):
             ports = str(value).split(',')
             if len(ports) == 1:
                 ports = ports[0].split(':', 1)
@@ -76,17 +80,22 @@ class Rule(object):
                     self._ports = tuple(range(int(ports[0]), int(ports[1]) + 1))
             else:
                 self._ports = tuple(sorted([int(port) for port in set(ports)]))
+        elif isinstance(value, (list, tuple)):
+            self._ports = tuple([int(port) for port in value])
+        else:
+            raise TypeError(
+                'Port must be a string or integer or a list or tuple of strings or integers.')
 
-    def address_matches(self, request):
+    def host_matches(self, request):
         remote_ip = get_remote_ip(request)
         remote_host = get_remote_host(request)
 
-        if self.address:
-            if remote_host == self.address:
+        if self.host:
+            if remote_host == self.host:
                 return True
 
             try:
-                return remote_ip in ipcalc.Network(self.address)
+                return remote_ip in ipcalc.Network(self.host)
             except ValueError:
                 return False
 
@@ -97,7 +106,7 @@ class Rule(object):
         return server_port in self._ports if self.port else True
 
     def matches(self, request):
-        return self.address_matches(request) and self.port_matches(request)
+        return self.host_matches(request) and self.port_matches(request)
 
 
 class RuleSet(object):
@@ -119,7 +128,7 @@ class RuleSet(object):
         return '\n'.join([str(rule) for rule in self.rules])
 
     def __repr__(self):
-        return '<RuleSet: {} rules>'.format(len(self.rules))
+        return repr(self.rules)
 
     @property
     def rules(self):

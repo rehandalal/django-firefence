@@ -15,7 +15,7 @@ def default_view(request):
     return True
 
 
-@fence_protected(rules=[Rule(action=Rule.ALLOW, address='127.0.0.1')])
+@fence_protected(rules=[Rule(action=Rule.ALLOW, host='127.0.0.1')])
 def rules_view(request):
     return True
 
@@ -25,7 +25,7 @@ def backend_view(request):
     return True
 
 
-@fence_protected(rules=[Rule(action=Rule.ALLOW, address='127.0.0.1')], backend_class=Fence)
+@fence_protected(rules=[Rule(action=Rule.ALLOW, host='127.0.0.1')], backend_class=Fence)
 def custom_view(request):
     return True
 

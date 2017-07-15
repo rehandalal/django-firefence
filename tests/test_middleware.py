@@ -14,9 +14,9 @@ class TestFirefenceMiddleware(TestCase):
         """Test that the middleware works as expected."""
         middleware = FirefenceMiddleware(Mock())
 
-        # Ensure no errors when connecting from an allowed address
+        # Ensure no errors when connecting from an allowed host
         middleware(mock_request(REMOTE_ADDR='192.168.1.1'))
 
-        # Exception is raised when connection from a banned address
+        # Exception is raised when connection from a banned host
         with pytest.raises(CustomFence.Rejection):
             middleware(mock_request(REMOTE_ADDR='127.0.0.1'))

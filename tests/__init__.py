@@ -5,8 +5,8 @@ from firefence.backends import AbstractFence
 
 def mock_request(**kwargs):
     """Creates a request object for testing."""
-    rf = RequestFactory(**kwargs)
-    return rf.get('/')
+    rf = RequestFactory()
+    return rf.get('/', **kwargs)
 
 
 class CustomFence(AbstractFence):

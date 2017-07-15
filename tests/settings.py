@@ -11,6 +11,6 @@ FIREFENCE = {
     'DEFAULT_BACKEND': 'tests.CustomFence',
     'RULES': [{
         'action': 'ALLOW',
-        'address': '192.168.1.1',
+        'host': '192.168.1.1',
     }],
 }
