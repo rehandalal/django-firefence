@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/django-firefence.svg)](https://pypi.python.org/pypi/django-firefence) [![Travis](https://img.shields.io/travis/rehandalal/django-firefence.svg)](https://travis-ci.org/rehandalal/django-firefence) [![Codecov](https://img.shields.io/codecov/c/github/rehandalal/django-firefence.svg)](https://codecov.io/gh/rehandalal/django-firefence)
  
-![Django 1.9](https://img.shields.io/badge/Django-1.8-pink.svg) ![Django 1.9](https://img.shields.io/badge/Django-1.9-pink.svg) ![Django 1.10](https://img.shields.io/badge/Django-1.10-pink.svg) ![Django 1.11](https://img.shields.io/badge/Django-1.11-pink.svg)
+![Django 1.9](https://img.shields.io/badge/Django-1.8-orange.svg) ![Django 1.9](https://img.shields.io/badge/Django-1.9-orange.svg) ![Django 1.10](https://img.shields.io/badge/Django-1.10-orange.svg) ![Django 1.11](https://img.shields.io/badge/Django-1.11-orange.svg)
 
 ### Quick Start
 
