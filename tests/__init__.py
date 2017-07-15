@@ -14,5 +14,5 @@ class CustomFence(AbstractFence):
     class Rejection(Exception):
         pass
 
-    def reject(self):
+    def reject(self, request, *args, **kwargs):
         raise self.Rejection()
