@@ -23,11 +23,13 @@ MIDDLEWARE = [
 ]
 
 FIREFENCE = {
-    'RULES': {
-        'action': 'ALLOW',
-        'host': '192.168.1.1',
-        'port': '80, 443',
-    }
+    'RULES': [
+        {
+            'action': 'ALLOW',
+            'host': '192.168.1.1',
+            'port': '80, 443',
+        }
+    ]
 }
 ```
 
