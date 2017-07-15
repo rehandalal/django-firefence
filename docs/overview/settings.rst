@@ -23,6 +23,8 @@ These are the available settings:
     A list or tuple of default rules. These will be used by the middleware or the decorator
     (if not specified).
 
+    Each rule may be a ``dict`` or a ``Rule`` object.
+
     *DEFAULT:* ``()``
 
 
