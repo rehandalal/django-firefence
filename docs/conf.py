@@ -54,7 +54,7 @@ author = u'Rehan Dalal'
 # built documents.
 #
 # The short X.Y version.
-version = __import__('firefence').__version__
+version = '0.1.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 
