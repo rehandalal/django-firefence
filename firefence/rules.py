@@ -1,3 +1,5 @@
+import socket
+
 import ipcalc
 
 
@@ -89,13 +91,14 @@ class Rule(object):
     def host_matches(self, request):
         remote_ip = get_remote_ip(request)
         remote_host = get_remote_host(request)
+        host_ip = self.host
 
         if self.host:
             if remote_host == self.host:
-                return True
+                host_ip = socket.gethostbyname(self.host)
 
             try:
-                return remote_ip in ipcalc.Network(self.host)
+                return remote_ip in ipcalc.Network(host_ip)
             except ValueError:
                 return False
 

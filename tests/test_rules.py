@@ -1,6 +1,5 @@
+import mock
 import pytest
-
-from mock import Mock
 
 from firefence.rules import (
     get_remote_host,
@@ -44,7 +43,7 @@ class TestUtilityMethods(object):
         request = mock_request(HTTP_X_FORWARDED_PORT='8000', SERVER_PORT='80')
         assert get_server_port(request) == 8000
 
-        request = Mock()
+        request = mock.Mock()
         request.META = {}
         assert get_server_port(request) is None
 
@@ -116,10 +115,21 @@ class TestRule(object):
         assert rule.host_matches(mock_request())
 
         # Test hostname matching
-        rule = Rule(action=Rule.ALLOW, host='the.host')
-        assert rule.host_matches(mock_request(REMOTE_HOST='the.host'))
-        assert not rule.host_matches(mock_request(REMOTE_HOST='not.the.host'))
-        assert not rule.host_matches(mock_request(REMOTE_HOST='THE.HOST'))
+        with mock.patch('socket.gethostbyname') as mock_ghbn:
+            mock_ghbn.return_value = '1.1.1.1'
+
+            rule = Rule(action=Rule.ALLOW, host='the.host')
+
+            assert rule.host_matches(mock_request(REMOTE_HOST='the.host', REMOTE_ADDR='1.1.1.1'))
+
+            assert not rule.host_matches(
+                mock_request(REMOTE_HOST='the.host', REMOTE_ADDR='2.2.2.2'))
+
+            assert not rule.host_matches(
+                mock_request(REMOTE_HOST='not.the.host', REMOTE_ADDR='1.1.1.1'))
+
+            assert not rule.host_matches(
+                mock_request(REMOTE_HOST='THE.HOST', REMOTE_ADDR='1.1.1.1'))
 
         # Test IPv4 matching
         rule = Rule(action=Rule.ALLOW, host='1.1.1.1')
